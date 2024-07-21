@@ -2,12 +2,9 @@ import React from 'react';
 import LogicaNegocio from '../predominio/PredominioPrueba';
 import { FiMic, FiMicOff, FiVideoOff, FiVideo } from "react-icons/fi";
 
-const imagenNoEmision = 'https://th.bing.com/th/id/R.8a1ac7224afc75e9e59aa287d47ec3f1?rik=TMbtO2nTyZ4AIA&pid=ImgRaw&r=0';
 
-const anchoImagen = '730px'; // Definir variables para el ancho y alto
-const altoImagen = '550px';
 
-const Presentacion = () => {
+function Presentacion(props){
   return (
     <LogicaNegocio>
       {({
@@ -18,7 +15,10 @@ const Presentacion = () => {
         status,
         isConnected,
         videoRef,
-        canvasRef
+        canvasRef,
+        imagenNoEmision,
+        anchoImagen,
+        altoImagen
       }) => (
         <div className="min-h-screen flex flex-col items-center justify-center bg-black">
           <div className="flex flex-col items-center">

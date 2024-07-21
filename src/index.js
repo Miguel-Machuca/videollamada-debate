@@ -3,6 +3,14 @@ import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
+import Admin from "layouts/Admin.js";
+import Auth from "layouts/Auth.js";
+
+// views without layouts
+
+import Landing from "views/Landing.js";
+import Profile from "views/Profile.js";
+import Index from "views/Index.js";
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(

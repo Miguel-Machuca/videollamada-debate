@@ -3,7 +3,7 @@ import { io } from 'socket.io-client';
 
 const socket = io('http://localhost:3000');
 
-const LogicaNegocio = ({ children }) => {
+function LogicaNegocio(props) {
   const [isConnected, setIsConnected] = useState(false);
   const [isEmitting, setIsEmitting] = useState(false);
   const [status, setStatus] = useState('');
@@ -16,6 +16,17 @@ const LogicaNegocio = ({ children }) => {
   useEffect(() => {
     socket.on('connect', () => setIsConnected(true));
     socket.on('disconnect', () => setIsConnected(false));
+
+    return () => {
+      socket.off('connect');
+      socket.off('disconnect');
+      if (emitIntervalRef.current) {
+        clearInterval(emitIntervalRef.current);
+      }
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach(track => track.stop());
+      }
+    };
   }, []);
 
   const publicarMensaje = (msg) => {
@@ -26,12 +37,12 @@ const LogicaNegocio = ({ children }) => {
     streamRef.current = stream;
     if (videoRef.current) {
       videoRef.current.srcObject = stream;
-      publicarMensaje('camara funcionando');
+      publicarMensaje('Cámara funcionando');
     }
   };
 
   const errorCamara = () => {
-    publicarMensaje('camara ha fallado');
+    publicarMensaje('La cámara ha fallado');
   };
 
   const verVideo = () => {
@@ -39,12 +50,14 @@ const LogicaNegocio = ({ children }) => {
     const context = canvas.getContext('2d');
     const video = videoRef.current;
 
-    context.save();
-    context.scale(-1, 1);
-    context.drawImage(video, -canvas.width, 0, canvas.width, canvas.height);
-    context.restore();
+    if (context && video) {
+      context.save();
+      context.scale(-1, 1);
+      context.drawImage(video, -canvas.width, 0, canvas.width, canvas.height);
+      context.restore();
 
-    socket.emit('stream', canvas.toDataURL('image/webp'));
+      socket.emit('stream', canvas.toDataURL('image/webp'));
+    }
   };
 
   const handleEmitClick = () => {
@@ -55,7 +68,7 @@ const LogicaNegocio = ({ children }) => {
         streamRef.current = null;
       }
       setIsEmitting(false);
-      publicarMensaje('emisión detenida');
+      publicarMensaje('Emisión detenida');
     } else {
       navigator.mediaDevices.getUserMedia({ video: true, audio: isAudioEnabled })
         .then(loadCamara)
@@ -63,7 +76,7 @@ const LogicaNegocio = ({ children }) => {
 
       emitIntervalRef.current = setInterval(verVideo, 300);
       setIsEmitting(true);
-      publicarMensaje('emitiendo...');
+      publicarMensaje('Emitiendo...');
     }
   };
 
@@ -71,9 +84,13 @@ const LogicaNegocio = ({ children }) => {
     setIsAudioEnabled(prev => !prev);
   };
 
+  const imagenNoEmision = 'https://th.bing.com/th/id/R.8a1ac7224afc75e9e59aa287d47ec3f1?rik=TMbtO2nTyZ4AIA&pid=ImgRaw&r=0';
+  const anchoImagen = '730px';
+  const altoImagen = '550px';
+
   return (
     <>
-      {children({
+      {props.children({
         handleEmitClick,
         handleAudioClick,
         isEmitting,
@@ -81,7 +98,10 @@ const LogicaNegocio = ({ children }) => {
         status,
         isConnected,
         videoRef,
-        canvasRef
+        canvasRef,
+        imagenNoEmision,
+        anchoImagen,
+        altoImagen
       })}
     </>
   );

@@ -1,5 +1,5 @@
 import './App.css';
-import Router from "./routes/Router";
+import Router from "./router/Router";
 
 function App() {
   return (
@@ -8,3 +8,4 @@ function App() {
 }
 
 export default App;
+
